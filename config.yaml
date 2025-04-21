@@ -1,0 +1,51 @@
+# Resume Analysis System Configuration
+
+output_dir: "output"
+
+data_processing:
+  ocr_enabled: true 
+  min_confidence: 60 
+
+# Whitefonting detection settings
+whitefonting_detection:
+  enabled: true
+  white_threshold: 240 
+  min_white_percentage: 0.1 
+  generate_heatmaps: true 
+
+# Resume classification settings
+classification:
+  enabled: true
+  model_type: "random_forest" # Options: naive_bayes, random_forest, logistic_regression
+  model_path: "models/resume_classifier_rf.pkl" 
+  categories: 
+    - "HR"
+    - "Information-technology"
+    - "Healthcare"
+    - "Teacher"
+    - "Chef"
+
+# Turnover prediction settings
+turnover_prediction:
+  enabled: true
+  model_type: "random_forest" # Options: random_forest, gradient_boosting, logistic_regression, svm
+  model_path: "models/turnover_rf_model.pkl" 
+  threshold: 0.5
+
+# Visualization settings
+visualization:
+  enabled: true
+  interactive: true 
+  static: true 
+  dashboard: true 
+
+# Reporting settings
+reporting:
+  enabled: true
+  include_visualizations: true
+  output_format: "pdf" 
+
+logging:
+  level: "INFO" 
+  file: "resume_analysis.log"
+  console: true
