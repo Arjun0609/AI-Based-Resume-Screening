@@ -7,7 +7,6 @@ logger = logging.getLogger(__name__)
 
 class FontAnalyzer:
     def __init__(self):
-        """Initialize the FontAnalyzer."""
         logger.info("Initializing FontAnalyzer")
 
     def analyze_fonts(self, document):
@@ -60,15 +59,6 @@ class FontAnalyzer:
         return font_df
 
     def get_font_statistics(self, font_df):
-        """
-        Generate statistics from font metadata.
-
-        Args:
-            font_df (pd.DataFrame): DataFrame containing font metadata.
-
-        Returns:
-            dict: Statistics about the fonts in the document.
-        """
         if font_df.empty:
             return {
                 "total_spans": 0,
@@ -78,26 +68,21 @@ class FontAnalyzer:
                 "white_text_percentage": 0,
             }
 
-        # Count total text spans
         total_spans = len(font_df)
 
-        # Count unique fonts, sizes, and colors
         unique_fonts = font_df["font"].nunique()
         unique_sizes = font_df["size"].nunique()
         unique_colors = font_df["color_hex"].nunique()
 
-        # Calculate percentage of white or near-white text
         white_text_count = font_df["is_white_or_near_white"].sum()
         white_text_percentage = (
             (white_text_count / total_spans) * 100 if total_spans > 0 else 0
         )
 
-        # Group by color and calculate statistics
         color_stats = font_df.groupby("color_hex").size().reset_index(name="count")
         color_stats["percentage"] = (color_stats["count"] / total_spans) * 100
         color_stats = color_stats.sort_values("count", ascending=False)
 
-        # Calculate color distribution
         color_distribution = color_stats.to_dict("records")
 
         return {

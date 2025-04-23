@@ -214,21 +214,6 @@ class ResumeClassifierModel:
 
             scores[category] = score
 
-        if sum(scores.values()) < 0.1:
-            words = resume_text.split()
-            word_count = len(words)
-            avg_word_length = sum(len(word) for word in words) / max(1, word_count)
-
-            if avg_word_length > 7:
-                scores["Information-technology"] += 0.15
-                scores["Healthcare"] += 0.12
-            elif word_count > 500:
-                scores["Information-technology"] += 0.1
-                scores["HR"] += 0.08
-            else:
-                scores["Chef"] += 0.1
-                scores["Teacher"] += 0.08
-
         total_score = max(0.001, sum(scores.values()))
         probabilities = {cat: score / total_score for cat, score in scores.items()}
 

@@ -7,6 +7,9 @@ import json
 from datetime import datetime
 from pathlib import Path
 import json
+import numpy as np
+
+from whitefonting_detection.semantic_analyzer import SemanticAnalyzer
 
 logging.basicConfig(
     level=logging.INFO,
@@ -15,6 +18,28 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+
+def convert_types(obj):
+    if isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, np.bool_):
+        return bool(obj)
+    elif isinstance(obj, dict):
+        return {k: convert_types(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_types(i) for i in obj]
+    elif hasattr(obj, "item") and callable(obj.item):
+        try:
+            return obj.item()
+        except:
+            return obj
+    else:
+        return obj
 
 
 def pretty_print_json(data):
@@ -74,6 +99,7 @@ class ResumeAnalysisSystem:
                 "white_threshold", 240
             )
         )
+        self.semantic_analyzer = SemanticAnalyzer()
         self.detection_report_generator = DetectionReportGenerator(
             output_dir=os.path.join(self.output_dir, "whitefonting_reports")
         )
@@ -145,6 +171,11 @@ class ResumeAnalysisSystem:
                 "classification": classification_results,
                 "turnover_prediction": turnover_results,
             }
+
+            if whitefonting_results:
+                self.detection_report_generator.generate_report(
+                    document, whitefonting_results
+                )
 
             if generate_report and self.report_generator:
                 report_path = self.report_generator.generate_comprehensive_report(
@@ -239,6 +270,10 @@ class ResumeAnalysisSystem:
 
         white_text_analysis = self.white_text_detector.analyze_white_text(white_text_df)
 
+        semantic_results = self.semantic_analyzer.analyze_semantic_content(
+            document, white_text_analysis["white_text_content"]
+        )
+
         heatmap_results = None
         if generate_visuals and white_text_analysis["has_white_text"]:
             heatmap_path = os.path.join(self.output_dir, "heatmaps")
@@ -246,9 +281,16 @@ class ResumeAnalysisSystem:
                 document, white_text_df, output_path=heatmap_path
             )
 
+        converted_font_result = convert_types(font_statistics)
+        converted_semantic_result = convert_types(semantic_results)
+        pretty_print_json(converted_font_result)
+        pretty_print_json(white_text_analysis)
+        pretty_print_json(converted_semantic_result)
+
         return {
             "font_statistics": font_statistics,
             "white_text_analysis": white_text_analysis,
+            "semantic_analysis": semantic_results,
             "has_white_text": white_text_analysis["has_white_text"],
             "white_text_percentage": font_statistics["white_text_percentage"],
             "white_text_content": white_text_analysis.get("white_text_content", ""),
@@ -445,8 +487,12 @@ def main():
         pretty_print_json({"Document Info": results["document_info"]})
 
         pretty_print_json({"Features": results["features"]})
+
         print(
             f"White Text Detected: {'Yes' if results['whitefonting_detection']['has_white_text'] else 'No'}"
+        )
+        print(
+            f"Has Suspicious Content: {results['whitefonting_detection']['semantic_analysis']['has_suspicious_content']}"
         )
         print(f"Classification: {results['classification']['predicted_category']}")
         print(
