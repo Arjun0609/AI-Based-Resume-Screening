@@ -28,3 +28,4 @@ transformers>=4.12.0  # For advanced NLP (optional)
 
 # Visualization and reporting
 reportlab>=3.6.0  # For PDF report generation
+rich>=14.0.0 # For terminal output formatting

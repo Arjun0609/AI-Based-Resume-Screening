@@ -28,5 +28,9 @@ python -m spacy download en_core_web_md
 >>> exit()
 
 # Run the main script
+python app.py analyze <resume_path>
+# eg:
 python app.py analyze test_resume.pdf
+# or run batch analyze
+python app.py batch <path_to_folder>
 ```

@@ -24,10 +24,24 @@ class TurnoverPredictor:
         employment_records = self.employment_analyzer.extract_employment_history(
             resume_text
         )
-
-        pattern_analysis = self.employment_analyzer.analyze_employment_patterns(
-            employment_records
-        )
+                
+        if len(employment_records) == 0:
+            logger.warning("No employment records found, skipping pattern analysis.")
+            pattern_analysis = {
+                "average_tenure": 0,
+                "average_tenure_years": 0,
+                "total_experience": 0,
+                "total_experience_years": 0,
+                "job_count": 0,
+                "job_changing_frequency": 0,
+                "has_gaps": False,
+                "gap_count": 0,
+                "gap_details": [],
+            }
+        else:
+            pattern_analysis = self.employment_analyzer.analyze_employment_patterns(
+                employment_records
+            )
 
         features = {
             "average_tenure": pattern_analysis["average_tenure"],
@@ -113,7 +127,12 @@ class TurnoverPredictor:
         importance = {}
 
         for column in features.columns:
-            value = features.iloc[0][column]
+            if features[column].dtype == 'int64':
+                value = int(features.iloc[0][column])
+            elif features[column].dtype == 'float64':
+                value = float(features.iloc[0][column])
+            else:
+                value = features.iloc[0][column]
 
             if column == "job_changing_frequency":
                 importance[column] = {
@@ -148,6 +167,7 @@ class TurnoverPredictor:
                     ),
                 }
             elif column == "has_gaps":
+                # The value is a Python int at this point
                 importance[column] = {
                     "value": bool(value),
                     "importance": "medium" if value else "low",

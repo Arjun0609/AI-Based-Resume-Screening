@@ -18,12 +18,31 @@ classification:
   enabled: true
   model_type: "random_forest" # Options: naive_bayes, random_forest, logistic_regression
   model_path: "models/resume_classifier_rf.pkl" 
-  categories: 
+  categories:
+    - "Accountant" 
+    - "Advocate"
+    - "Agriculture"
+    - "Apparel"
+    - "Arts"
+    - "Automobile"
+    - "Aviation"
+    - "Banking"
+    - "BPO"
+    - "Business-development"
+    - "Chef"
+    - "Construction"
+    - "Consultant"
+    - "Designer"
+    - "Digital-media"
+    - "Engineering"
+    - "Finance"
+    - "Fitness"
+    - "Healthcare"
     - "HR"
     - "Information-technology"
-    - "Healthcare"
+    - "Public-relations"
+    - "Sales"
     - "Teacher"
-    - "Chef"
 
 # Turnover prediction settings
 turnover_prediction:

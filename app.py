@@ -1,5 +1,7 @@
 import os
 import logging
+from rich.console import Console
+from rich.logging import RichHandler
 import argparse
 import yaml
 import sys
@@ -11,10 +13,11 @@ import numpy as np
 
 from whitefonting_detection.semantic_analyzer import SemanticAnalyzer
 
+console = Console()
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler(), logging.FileHandler("resume_analysis.log")],
+    format="%(message)s",
+    handlers=[RichHandler(console=console), logging.FileHandler("resume_analysis.log")],
 )
 
 logger = logging.getLogger(__name__)
@@ -42,8 +45,16 @@ def convert_types(obj):
         return obj
 
 
+from rich.table import Table
+from rich.panel import Panel
+
 def pretty_print_json(data):
-    print(json.dumps(data, indent=4, sort_keys=True))
+    table = Table(title="JSON Data", show_header=True, header_style="bold magenta")
+    table.add_column("Key", style="cyan")
+    table.add_column("Value", style="green")
+    for key, value in data.items():
+        table.add_row(str(key), str(value))
+    console.print(Panel(table, title="Formatted JSON", border_style="blue"))
 
 
 class ResumeAnalysisSystem:
@@ -146,7 +157,7 @@ class ResumeAnalysisSystem:
         generate_report=True,
         generate_dashboard=True,
     ):
-        logger.info(f"Analyzing resume: {file_path}")
+        logger.debug(f"Analyzing resume: {file_path}")
 
         try:
 
@@ -201,8 +212,14 @@ class ResumeAnalysisSystem:
             f"Batch analyzing resumes in {directory_path} matching {file_pattern}"
         )
 
+        file_extensions = []
+        for pattern in file_pattern.split(';'):
+            extension = os.path.splitext(pattern)[1].lower()
+            if extension: 
+                file_extensions.append(extension)
+
         batch_docs = self.document_loader.batch_load(
-            directory_path, file_pattern.split(";")
+            directory_path, file_types=file_extensions
         )
 
         if not batch_docs:
@@ -257,7 +274,7 @@ class ResumeAnalysisSystem:
                 batch_results
             )
 
-        logger.info(f"Batch analysis completed for {len(batch_results)} resumes")
+            logger.info(f"Batch analysis completed for {len(batch_results)} resumes")
         return batch_results, batch_report_path, batch_dashboard_path
 
     def _detect_whitefonting(self, document, generate_visuals=True):
@@ -356,6 +373,7 @@ class ResumeAnalysisSystem:
                 employment_records = self.turnover_predictor.employment_analyzer.extract_employment_history(
                     text_content
                 )
+                    
                 pattern_analysis = self.turnover_predictor.employment_analyzer.analyze_employment_patterns(
                     employment_records
                 )
@@ -510,7 +528,7 @@ def main():
             args.directory, file_pattern=args.pattern
         )
 
-        print(f"\nBatch Analysis Results ({len(batch_results)} resumes):")
+        console.print(f"\nBatch Analysis Results ({len(batch_results)} resumes):", style="bold cyan")
 
         white_text_count = sum(
             1
@@ -525,18 +543,20 @@ def main():
             .get("will_leave", False)
         )
 
-        print(
-            f"White Text Detected: {white_text_count} ({white_text_count/len(batch_results)*100:.1f}%)"
-        )
-        print(
-            f"High Turnover Risk: {high_risk_count} ({high_risk_count/len(batch_results)*100:.1f}%)"
-        )
+        summary_table = Table(title="Batch Analysis Summary", header_style="bold magenta")
+        summary_table.add_column("Metric", style="cyan")
+        summary_table.add_column("Value", style="green")
+        summary_table.add_row("Total Resumes Processed", str(len(batch_results)))
+        summary_table.add_row("White Text Detected", f"{white_text_count} ({white_text_count/len(batch_results)*100:.1f}%)")
+        summary_table.add_row("High Turnover Risk", f"{high_risk_count} ({high_risk_count/len(batch_results)*100:.1f}%)")
+
+        console.print(summary_table)
 
         if batch_report:
-            print(f"\nBatch report generated: {batch_report}")
+            console.print(f"\nBatch report generated: [link={batch_report}]{batch_report}[/link]", style="bold yellow")
 
         if batch_dashboard:
-            print(f"Interactive dashboard: {batch_dashboard}")
+            console.print(f"Interactive dashboard: [link={batch_dashboard}]{batch_dashboard}[/link]", style="bold yellow")
 
     elif args.command == "generate-samples":
         sample_paths = system.generate_sample_documents(
