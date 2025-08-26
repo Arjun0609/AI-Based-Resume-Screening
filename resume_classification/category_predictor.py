@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 logger = logging.getLogger(__name__)
+analysis_logger = logging.getLogger("analysis")
 
 
 class CategoryPredictor:
@@ -72,6 +73,7 @@ class CategoryPredictor:
             adjusted_confidence = min(0.98, prediction["confidence"] + keyword_boost)
             prediction["confidence"] = adjusted_confidence
 
+        analysis_logger.info(f"{prediction}")
         logger.info(
             f"Predicted category: {prediction['predicted_category']} with confidence: {prediction['confidence']:.4f}"
         )

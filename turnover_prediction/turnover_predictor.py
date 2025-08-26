@@ -4,7 +4,7 @@ import logging
 import os
 
 logger = logging.getLogger(__name__)
-
+analysis_logger = logging.getLogger("analysis")
 
 class TurnoverPredictor:
     def __init__(self, model_path=None):
@@ -87,6 +87,7 @@ class TurnoverPredictor:
             "feature_importance": feature_importance,
             "contextual_analysis": contextual_analysis,
         }
+        analysis_logger.info(f"{results}")
 
         return results
 

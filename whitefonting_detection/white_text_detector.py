@@ -9,7 +9,7 @@ import fitz
 import os
 
 logger = logging.getLogger(__name__)
-
+analysis_logger = logging.getLogger("analysis")
 
 class WhiteTextDetector:
 
@@ -74,8 +74,8 @@ class WhiteTextDetector:
                 keyword_matches.append(keyword)
 
         keyword_stuffing_detected = len(keyword_matches) > 3
-
-        return {
+        
+        results = {
             "has_white_text": True,
             "white_text_count": len(white_text_df),
             "white_text_content": white_text_content,
@@ -83,6 +83,8 @@ class WhiteTextDetector:
             "potential_keywords": keyword_matches,
             "keyword_stuffing_detected": keyword_stuffing_detected,
         }
+
+        return results
 
     def create_visual_heatmap(self, document, white_text_df, output_path=None):
         if document["metadata"]["file_type"] != "pdf" or white_text_df.empty:

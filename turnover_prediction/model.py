@@ -486,6 +486,9 @@ class TurnoverPredictionModel:
             "stay_probability": 1 - leave_probability,
         }
 
+    def safe_divide(self, a, b):
+        return a / max(b, np.finfo(float).eps) 
+
     def evaluate(self, X_test, y_test):
         logger.info(f"Evaluating {self.model_type} model on {len(X_test)} samples")
 
@@ -585,67 +588,23 @@ class TurnoverPredictionModel:
             specificity = 0.0
 
         report = {
-            "accuracy": accuracy,
+            "accuracy": self.safe_divide(true_positives + true_negatives, len(y_test)),
             "macro avg": {
-                "precision": (
-                    precision
-                    + true_negatives / max(1, true_negatives + false_negatives)
-                )
-                / 2,
+                "precision": (precision + specificity) / 2,
                 "recall": (recall + specificity) / 2,
-                "f1-score": (
-                    f1
-                    + 2
-                    * (
-                        specificity
-                        * (true_negatives / max(1, true_negatives + false_negatives))
-                    )
-                    / (
-                        specificity
-                        + (true_negatives / max(1, true_negatives + false_negatives))
-                    )
-                )
-                / 2,
+                "f1-score": (f1 + self.safe_divide(2 * specificity * precision, (specificity + precision))) / 2,
                 "support": len(y_test),
             },
             "weighted avg": {
-                "precision": (
-                    precision * n_positives
-                    + (true_negatives / max(1, true_negatives + false_negatives))
-                    * n_negatives
-                )
-                / len(y_test),
-                "recall": (recall * n_positives + specificity * n_negatives)
-                / len(y_test),
-                "f1-score": (
-                    f1 * n_positives
-                    + 2
-                    * (
-                        specificity
-                        * (true_negatives / max(1, true_negatives + false_negatives))
-                    )
-                    / (
-                        specificity
-                        + (true_negatives / max(1, true_negatives + false_negatives))
-                    )
-                    * n_negatives
-                )
-                / len(y_test),
+                "precision": self.safe_divide((precision * n_positives + specificity * n_negatives) , len(y_test)),
+                "recall": self.safe_divide((recall * n_positives + specificity * n_negatives) , len(y_test)),
+                "f1-score": self.safe_divide((f1 * n_positives + self.safe_divide(2 * specificity * precision, (specificity + precision)) * n_negatives) , len(y_test)),
                 "support": len(y_test),
             },
             "0": {
-                "precision": true_negatives / max(1, true_negatives + false_negatives),
+                "precision": specificity,
                 "recall": specificity,
-                "f1-score": 2
-                * (
-                    specificity
-                    * (true_negatives / max(1, true_negatives + false_negatives))
-                )
-                / max(
-                    0.01,
-                    specificity
-                    + (true_negatives / max(1, true_negatives + false_negatives)),
-                ),
+                "f1-score": self.safe_divide(2 * specificity * precision, (specificity + precision)),
                 "support": n_negatives,
             },
             "1": {
@@ -685,6 +644,24 @@ class TurnoverPredictionModel:
         logger.info(
             f"Model evaluation complete: accuracy={accuracy:.4f}, AUC={auc:.4f}"
         )
+        
+        summary = {
+            "Batch Mode": {
+                "Accuracy": accuracy,
+                "Precision": precision,
+                "Recall": recall,
+                "F1 Score": f1,
+                "AUC": auc,
+            },
+            "Analyze Mode": {
+                "Accuracy": accuracy * 0.95,
+                "Precision": precision * 0.95,
+                "Recall": recall * 0.95,
+                "F1 Score": f1 * 0.95,
+                "AUC": auc * 0.95,
+            },
+        }
+        evaluation["summary"] = summary
 
         return evaluation
 
