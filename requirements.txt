@@ -10,6 +10,8 @@ plotly
 PyYAML
 gensim
 spacy
+scipy==1.13.1; python_version < "3.13"
+scipy==1.13.1; python_version >= "3.13" and platform_machine == "x86_64"
 
 # Document processing
 PyMuPDF  # For PDF processing
