@@ -1,14 +1,12 @@
 numpy==1.26.4
-pandas==2.2.2
+pandas==2.1.4
 matplotlib==3.8.4
 seaborn==0.13.2
 plotly==5.22.0
 PyYAML==6.0.1
 gensim==4.3.2
 spacy==3.7.4
-# Use pre-built scipy instead of compiling
-scipy==1.13.1; python_version < "3.13"
-scipy==1.13.1; python_version >= "3.13" and platform_machine == "x86_64"
+scipy==1.13.1
 PyMuPDF==1.23.8
 python-docx==1.1.0
 docx2txt==0.9
