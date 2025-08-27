@@ -1,38 +1,27 @@
-# requirements.txt
-# Resume Analysis System Dependencies
-
-# Core dependencies
-numpy
-pandas
-matplotlib
-seaborn
-plotly
-PyYAML
-gensim
-spacy
+numpy==1.26.4
+pandas==2.2.2
+matplotlib==3.8.4
+seaborn==0.13.2
+plotly==5.22.0
+PyYAML==6.0.1
+gensim==4.3.2
+spacy==3.7.4
+# Use pre-built scipy instead of compiling
 scipy==1.13.1; python_version < "3.13"
 scipy==1.13.1; python_version >= "3.13" and platform_machine == "x86_64"
-
-# Document processing
-PyMuPDF  # For PDF processing
-python-docx  # For DOCX processing
-docx2txt  # For DOCX text extraction
-pytesseract  # For OCR
-Pillow  # For image processing
-opencv-python  # For image analysis
-python-dateutil  # For date parsing
-
-# NLP and machine learning
-nltk
-scikit-learn
-torch  # For deep learning models (optional)
-transformers  # For advanced NLP (optional)
-
-# Visualization and reporting
-reportlab # For PDF report generation
-rich # For terminal output formatting
-
-# Server and API
-flask # For web server
-werkzeug # For WSGI utilities
-flask-cors # For handling CORS
+PyMuPDF==1.23.8
+python-docx==1.1.0
+docx2txt==0.9
+pytesseract==0.3.10
+Pillow==10.3.0
+opencv-python==4.9.0.80
+python-dateutil==2.9.0.post0
+nltk==3.8.1
+scikit-learn==1.4.2
+torch==2.2.1+cpu --index-url https://download.pytorch.org/whl/cpu
+transformers==4.38.2
+reportlab==4.0.9
+rich==13.7.1
+flask==3.0.2
+werkzeug==3.0.1
+flask-cors==4.0.0
