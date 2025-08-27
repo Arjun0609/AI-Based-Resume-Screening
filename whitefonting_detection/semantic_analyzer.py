@@ -28,7 +28,7 @@ class SemanticAnalyzer:
     def __init__(self, config=None):
 
         self.config = {
-            "spacy_model": "en_core_web_md",
+            "spacy_model": "en_core_web_sm",
             "use_transformers": True,
             "transformer_model": "bert-base-uncased",
             "use_nltk": True,
