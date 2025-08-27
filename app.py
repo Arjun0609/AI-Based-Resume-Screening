@@ -18,6 +18,7 @@ import numpy as np
 import psutil
 import time
 import uuid
+import nltk
 
 from whitefonting_detection.semantic_analyzer import SemanticAnalyzer
 
@@ -130,6 +131,14 @@ class ResumeAnalysisSystem:
         from whitefonting_detection.font_analyzer import FontAnalyzer
         from whitefonting_detection.white_text_detector import WhiteTextDetector
         from whitefonting_detection.detection_report import DetectionReportGenerator
+        
+        try:
+            nltk.data.find('tokenizers/punkt')
+            nltk.data.find('tokenizers/punkt_tab')
+            nltk.data.find('corpora/stopwords')
+            nltk.data.find('corpora/wordnet')
+        except LookupError:
+            nltk.download(['punkt', 'punkt_tab', 'stopwords', 'wordnet'])
 
         self.document_loader = DocumentLoader()
         self.text_extractor = TextExtractor(
