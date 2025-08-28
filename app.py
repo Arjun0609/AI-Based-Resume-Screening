@@ -44,6 +44,9 @@ analysis_logger.propagate = False
 
 logger = logging.getLogger(__name__)
 
+app = Flask(__name__)
+CORS(app)
+
 def convert_types(obj):
     if isinstance(obj, np.integer):
         return int(obj)
@@ -692,7 +695,7 @@ class ResumeAnalysisSystem:
             return []
 
     
-def init_server(app, system):
+def init_server(system):
     # Configure file upload settings
     app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max file size
     app.config['UPLOAD_FOLDER'] = 'temp_uploads'
@@ -1191,9 +1194,7 @@ if __name__ == "__main__":
     system = ResumeAnalysisSystem()
 
     if args.command == "server":
-        app = Flask(__name__)
-        CORS(app)
-        init_server(app, system)
+        init_server(system)
         app.run(host="0.0.0.0", port=8500)
     elif args.command == "analyze":
         if not args.file_path:
