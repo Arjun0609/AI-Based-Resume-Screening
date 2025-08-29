@@ -1,12 +1,8 @@
 import os
 import logging
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
 
 logger = logging.getLogger(__name__)
 analysis_logger = logging.getLogger("analysis")
-
 
 class CategoryPredictor:
     def __init__(self, model_path=None):
@@ -23,6 +19,8 @@ class CategoryPredictor:
         )
 
     def train_model(self, resume_texts, categories, test_size=0.2, optimize=False):
+        from sklearn.model_selection import train_test_split
+        
         logger.info(f"Training model on {len(resume_texts)} resumes")
 
         preprocessed_texts = [

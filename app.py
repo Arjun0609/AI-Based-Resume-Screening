@@ -135,13 +135,23 @@ class ResumeAnalysisSystem:
         from whitefonting_detection.white_text_detector import WhiteTextDetector
         from whitefonting_detection.detection_report import DetectionReportGenerator
         
-        try:
-            nltk.data.find('tokenizers/punkt')
-            nltk.data.find('tokenizers/punkt_tab')
-            nltk.data.find('corpora/stopwords')
-            nltk.data.find('corpora/wordnet')
-        except LookupError:
-            nltk.download(['punkt', 'punkt_tab', 'stopwords', 'wordnet'])
+        required_data = [
+            ('tokenizers/punkt', 'punkt'),
+            ('corpora/stopwords', 'stopwords'),
+            ('corpora/wordnet', 'wordnet')
+        ]
+    
+        for data_path, download_name in required_data:
+            try:
+                nltk.data.find(data_path)
+                logger.info(f"✓ Found {download_name}")
+            except LookupError:
+                logger.info(f"Downloading {download_name}...")
+                try:
+                    nltk.download(download_name, quiet=True)
+                    logger.info(f"✓ Downloaded {download_name}")
+                except Exception as e:
+                    logger.error(f"✗ Failed to download {download_name}: {e}")
 
         self.document_loader = DocumentLoader()
         self.text_extractor = TextExtractor(

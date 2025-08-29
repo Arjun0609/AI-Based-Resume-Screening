@@ -3,7 +3,6 @@ import numpy as np
 import re
 import logging
 from PIL import Image
-import cv2
 import io
 import fitz
 import os
@@ -87,6 +86,8 @@ class WhiteTextDetector:
         return results
 
     def create_visual_heatmap(self, document, white_text_df, output_path=None):
+        import cv2
+        
         if document["metadata"]["file_type"] != "pdf" or white_text_df.empty:
             logger.warning("Cannot create heatmap: Not a PDF or no white text detected")
             return []

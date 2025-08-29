@@ -1,4 +1,3 @@
-import fitz
 import pandas as pd
 import logging
 

@@ -1,10 +1,3 @@
-import pandas as pd
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
-from sklearn.preprocessing import StandardScaler
 import pickle
 import os
 import logging
@@ -13,14 +6,15 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
-
 class TurnoverPredictionModel:
     def __init__(self, model_type="random_forest", model_path=None):
         self.model_type = model_type
         self.model = None
-        self.scaler = StandardScaler()
-
-        self._initialize_model()
+        
+        if os.environ['mode'] == "train":
+            from sklearn.preprocessing import StandardScaler
+            self.scaler = StandardScaler()
+            self._initialize_model()
 
         if model_path and os.path.exists(model_path):
             self.load_model(model_path)
@@ -31,6 +25,10 @@ class TurnoverPredictionModel:
         logger.info(f"Initializing TurnoverPredictionModel (type: {model_type})")
 
     def _initialize_model(self):
+        from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+        from sklearn.linear_model import LogisticRegression
+        from sklearn.svm import SVC
+
         if self.model_type == "random_forest":
             self.model = RandomForestClassifier(
                 n_estimators=100, max_depth=None, min_samples_split=2, random_state=42
@@ -666,6 +664,7 @@ class TurnoverPredictionModel:
         return evaluation
 
     def save_model(self, model_path):
+        from sklearn.preprocessing import StandardScaler
         if hasattr(self, "feature_means") == False:
             self._model_metric_init()
 
@@ -738,7 +737,6 @@ class TurnoverPredictionModel:
                         self.feature_importances_ = model_data.get(
                             "feature_importances_", {}
                         )
-                    self.scaler = saved_data.get("scaler", StandardScaler())
                     self.model_type = saved_data.get("model_type", self.model_type)
                 else:
                     self._model_metric_init()

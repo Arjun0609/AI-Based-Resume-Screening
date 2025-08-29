@@ -2,7 +2,6 @@ import os
 import json
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 from datetime import datetime
 import logging
 from reportlab.lib.pagesizes import letter
@@ -403,13 +402,19 @@ class DetectionReportGenerator:
             words = list(common_words.keys())[:10]
             counts = [common_words[word] for word in words]
 
-            sns.barplot(x=counts, y=words)
-            plt.title("Most Common Words in Hidden Text")
+            y_pos = range(len(words))
+            bars = plt.barh(y_pos, counts)
+            
+            plt.yticks(y_pos, words)
             plt.xlabel("Count")
+            plt.title("Most Common Words in Hidden Text")
+            bars[0].set_color('#1f77b4')
+            plt.grid(axis='x', alpha=0.3)
+
             plt.tight_layout()
 
             word_chart_path = f"{output_prefix}_common_words.png"
-            plt.savefig(word_chart_path)
+            plt.savefig(word_chart_path, dpi=100, bbox_inches='tight')
             plt.close()
 
             visualization_paths.append(word_chart_path)

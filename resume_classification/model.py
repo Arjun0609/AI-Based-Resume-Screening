@@ -1,18 +1,8 @@
-import numpy as np
-import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import Pipeline
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.metrics import classification_report, confusion_matrix
 import pickle
 import os
 import logging
 
 logger = logging.getLogger(__name__)
-
 
 class ResumeClassifierModel:
     CATEGORIES = [
@@ -48,7 +38,8 @@ class ResumeClassifierModel:
         self.vectorizer = None
         self.pipeline = None
 
-        self._initialize_pipeline()
+        if os.environ['mode'] == "train":
+           self._initialize_pipeline()
 
         if model_path and os.path.exists(model_path):
             self.load_model(model_path)
@@ -56,6 +47,12 @@ class ResumeClassifierModel:
         logger.info(f"Initializing ResumeClassifierModel (type: {model_type})")
 
     def _initialize_pipeline(self):
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.naive_bayes import MultinomialNB
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.linear_model import LogisticRegression
+        from sklearn.pipeline import Pipeline
+
         self.vectorizer = TfidfVectorizer(
             max_features=5000, min_df=5, max_df=0.7, sublinear_tf=True
         )
@@ -76,6 +73,8 @@ class ResumeClassifierModel:
         )
 
     def train(self, X_train, y_train, optimize=False):
+        from sklearn.model_selection import GridSearchCV
+        
         logger.info(f"Training {self.model_type} model on {len(X_train)} samples")
 
         if optimize:
@@ -107,6 +106,8 @@ class ResumeClassifierModel:
             return {"model_type": self.model_type, "train_samples": len(X_train)}
 
     def evaluate(self, X_test, y_test):
+        from sklearn.metrics import classification_report, confusion_matrix
+        
         logger.info(f"Evaluating {self.model_type} model on {len(X_test)} samples")
 
         y_pred = self.pipeline.predict(X_test)

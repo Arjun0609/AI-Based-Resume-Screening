@@ -4,4 +4,4 @@ dataset/
 *.pyo
 .venv/
 output/
-resume_analysis.log
+test_venv/

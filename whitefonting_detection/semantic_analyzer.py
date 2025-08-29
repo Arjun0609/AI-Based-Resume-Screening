@@ -4,14 +4,7 @@ import json
 import numpy as np
 import pandas as pd
 from collections import Counter, defaultdict
-import spacy
-from spacy.matcher import PhraseMatcher, Matcher
-from spacy.tokens import Doc, Span
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-import torch
-from transformers import AutoTokenizer, AutoModel, pipeline
-from gensim.models import KeyedVectors
+from spacy.matcher import PhraseMatcher
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -37,7 +30,7 @@ class SemanticAnalyzer:
             "skill_terms_path": "data/skills.json",
             "confidence_threshold": 0.7,
             "ngram_range": (1, 3),
-            "device": "cuda" if torch.cuda.is_available() else "cpu",
+            "device": "cpu",
         }
 
         if config:
@@ -48,6 +41,7 @@ class SemanticAnalyzer:
         logger.info("SemanticAnalyzer initialized")
 
     def _init_components(self):
+        import spacy
 
         try:
             self.nlp = spacy.load(self.config["spacy_model"])
@@ -69,6 +63,8 @@ class SemanticAnalyzer:
                 self.config["use_nltk"] = False
 
         if self.config["use_transformers"]:
+            from transformers import AutoTokenizer, AutoModel, pipeline
+            
             try:
                 self.tokenizer = AutoTokenizer.from_pretrained(
                     self.config["transformer_model"]
@@ -197,6 +193,7 @@ class SemanticAnalyzer:
     def _analyze_term_frequency(
         self, processed_visible, processed_hidden, raw_visible, raw_hidden
     ):
+        from sklearn.feature_extraction.text import TfidfVectorizer
 
         vectorizer = TfidfVectorizer(ngram_range=self.config["ngram_range"])
 
@@ -256,6 +253,8 @@ class SemanticAnalyzer:
     def _analyze_semantic_similarity(
         self, processed_visible, processed_hidden, raw_visible, raw_hidden
     ):
+        from sklearn.metrics.pairwise import cosine_similarity
+
         if not self.config["use_transformers"] or not self.model or not self.tokenizer:
             return {
                 "suspicious": False,
@@ -738,6 +737,7 @@ class SemanticAnalyzer:
         return summary
 
     def _get_embedding(self, text):
+        import torch
 
         inputs = self.tokenizer(
             text, return_tensors="pt", padding=True, truncation=True, max_length=512

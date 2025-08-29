@@ -1,5 +1,3 @@
-import fitz
-import pytesseract
 from PIL import Image
 import io
 import logging
@@ -42,6 +40,8 @@ class TextExtractor:
         return text.strip()
 
     def _ocr_page(self, page):
+        import pytesseract
+        
         try:
             pix = page.get_pixmap(dpi=300)
             img = Image.open(io.BytesIO(pix.tobytes("png")))
