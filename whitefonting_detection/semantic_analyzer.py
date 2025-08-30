@@ -22,7 +22,7 @@ class SemanticAnalyzer:
 
         self.config = {
             "spacy_model": "en_core_web_sm",
-            "use_transformers": True,
+            "use_transformers": False,
             "transformer_model": "bert-base-uncased",
             "use_nltk": True,
             "use_industry_terms": True,

@@ -19,10 +19,13 @@ import psutil
 import time
 import uuid
 import nltk
+from dotenv import load_dotenv
 
 from whitefonting_detection.semantic_analyzer import SemanticAnalyzer
 
 console = Console()
+
+load_dotenv()
 
 # Set up console logging for general messages
 console_handler = RichHandler(console=console)
@@ -998,6 +1001,52 @@ def init_server(system):
             return jsonify({
                 "status": "error",
                 "message": f"Failed to retrieve analysis history: {str(e)}"
+            }), 500
+
+    @app.route('/clear-log', methods=['GET'])
+    def clear_analysis_log():
+        """
+        Clear the resume_analysis.log file to remove all analysis history.
+        
+        Returns:
+            JSON response indicating success or failure
+        """
+        try:
+            log_file_path = "resume_analysis.log"
+            
+            if os.path.exists(log_file_path):
+                file_size = os.path.getsize(log_file_path)
+                
+                with open(log_file_path, 'w') as f:
+                    pass 
+                
+                logger.info(f"Analysis log cleared. Previous size: {file_size} bytes")
+                
+                return jsonify({
+                    "status": "success",
+                    "message": "Analysis log cleared successfully",
+                    "previous_size_bytes": file_size,
+                    "timestamp": datetime.now().isoformat()
+                }), 200
+            else:
+                return jsonify({
+                    "status": "success", 
+                    "message": "Log file does not exist, nothing to clear",
+                    "timestamp": datetime.now().isoformat()
+                }), 200
+                
+        except PermissionError:
+            logger.error("Permission denied when trying to clear analysis log")
+            return jsonify({
+                "status": "error",
+                "message": "Permission denied. Cannot clear the analysis log file."
+            }), 403
+            
+        except Exception as e:
+            logger.error(f"Error clearing analysis log: {e}")
+            return jsonify({
+                "status": "error",
+                "message": f"Failed to clear analysis log: {str(e)}"
             }), 500
 
     @app.route('/analysis/<analysis_id>', methods=['GET'])

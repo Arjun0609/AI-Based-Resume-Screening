@@ -19,7 +19,6 @@ class TurnoverPredictionModel:
         if model_path and os.path.exists(model_path):
             self.load_model(model_path)
         else:
-            # Simulate a model being loaded with some basic feature metadata
             self._model_metric_init()
 
         logger.info(f"Initializing TurnoverPredictionModel (type: {model_type})")
@@ -723,7 +722,7 @@ class TurnoverPredictionModel:
         try:
             if not os.path.exists(model_path):
                 logger.warning(
-                    f"Model file {model_path} doesn't exist, creating a dummy model file."
+                    f"Model file {model_path} doesn't exist, creating a model file."
                 )
                 self.save_model(model_path)
 

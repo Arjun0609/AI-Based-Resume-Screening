@@ -5,3 +5,5 @@ dataset/
 .venv/
 output/
 test_venv/
+.env
+resume_analysis.log
