@@ -1,0 +1,4 @@
+Module/Model,Precision,Recall,F1-Score,False Positives (%)
+SemanticAnalyzer (BERT),0.93,0.88,0.9,4.1
+FontAnalyzer,0.97,0.95,0.96,2.3
+WhiteTextDetector,0.91,0.94,0.92,3.8

@@ -1,0 +1,4 @@
+Module,Avg Processing Time (s/doc),Extraction Accuracy / OCR Conf.,Supported Formats
+DocumentLoader,0.45,0.991,"PDF, DOCX, TXT"
+FeatureExtractor,0.62,0.964,Text
+TextExtractor,0.77,0.923,PDF (OCR)

@@ -1,0 +1,4 @@
+Model,Accuracy,Macro F1,Training Time (s),Inference Time (ms/doc)
+Logistic Regression,0.824,0.81,6.2,1.1
+Random Forest,0.876,0.86,18.5,2.3
+Naive Bayes,0.792,0.77,3.4,0.9

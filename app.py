@@ -245,7 +245,10 @@ class ResumeAnalysisSystem:
                 "turnover_prediction": turnover_results,
             }
             
-            analysis_logger.info(f"{whitefonting_results}")
+            whitefonting_log = whitefonting_results.copy()
+            whitefonting_log.pop("heatmap_results", None)
+
+            analysis_logger.info(f"{whitefonting_log}")
             new_metadata = {key: value for key, value in document['metadata'].items() if key != 'creation_date'}
             analysis_logger.info(f"{new_metadata}")
             analysis_logger.info("{" + f"'skills': {features['skills']}" + "}")
