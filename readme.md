@@ -33,4 +33,7 @@ python app.py analyze <resume_path>
 python app.py analyze test_resume.pdf
 # or run batch analyze
 python app.py batch <path_to_folder>
+
+# To run the flask server
+python app.py server
 ```
